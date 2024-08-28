@@ -216,17 +216,6 @@ func (r *Storage) ValidateCreate() error {
 		return fmt.Errorf("erasure type %v requires at least %v storage nodes", r.Spec.Erasure, minNodesPerErasure[r.Spec.Erasure])
 	}
 
-	var authEnabled bool
-	if configuration.DomainsConfig.SecurityConfig != nil {
-		if configuration.DomainsConfig.SecurityConfig.EnforceUserTokenRequirement != nil {
-			authEnabled = *configuration.DomainsConfig.SecurityConfig.EnforceUserTokenRequirement
-		}
-	}
-
-	if (authEnabled && r.Spec.OperatorConnection == nil) || (!authEnabled && r.Spec.OperatorConnection != nil) {
-		return fmt.Errorf("field 'spec.operatorConnection' does not satisfy with config option `enforce_user_token_requirement: %t`", authEnabled)
-	}
-
 	if r.Spec.OperatorConnection != nil && r.Spec.OperatorConnection.Oauth2TokenExchange != nil {
 		auth := r.Spec.OperatorConnection.Oauth2TokenExchange
 		if auth.KeyID == nil {
@@ -311,17 +300,6 @@ func (r *Storage) ValidateUpdate(old runtime.Object) error {
 	}
 	if nodesNumber < minNodesPerErasure[r.Spec.Erasure] {
 		return fmt.Errorf("erasure type %v requires at least %v storage nodes", r.Spec.Erasure, minNodesPerErasure[r.Spec.Erasure])
-	}
-
-	var authEnabled bool
-	if configuration.DomainsConfig.SecurityConfig != nil {
-		if configuration.DomainsConfig.SecurityConfig.EnforceUserTokenRequirement != nil {
-			authEnabled = *configuration.DomainsConfig.SecurityConfig.EnforceUserTokenRequirement
-		}
-	}
-
-	if (authEnabled && r.Spec.OperatorConnection == nil) || (!authEnabled && r.Spec.OperatorConnection != nil) {
-		return fmt.Errorf("field 'spec.operatorConnection' does not align with config option `enforce_user_token_requirement: %t`", authEnabled)
 	}
 
 	if r.Spec.OperatorConnection != nil && r.Spec.OperatorConnection.Oauth2TokenExchange != nil {
